@@ -96,8 +96,31 @@ res.clearCookie('token');
 res.status(200).json({message: 'User logged out successfully'});
 
 
+/** * logoutUserController
+ * @description clear token from user cookies and add the token in blacklist, expacts token in cookies
+ * @access Public
+ */
+
+async function logoutUserController(req, res) {
+    
+
+}
 
 
+/**
+ * @name getMeController
+ * @description get user details of logged in user, requires token in cookies
+ * @access Private
+ */
+async function getMeController(req, res) {
+    const user = await userModel.findById(req.user.id)
+    res.status(200).json({
+        user:{
+            id: user._id,
+            username: user.username,
+            email: user.email
+        }
+    });
+}
 
-
-module.exports = { registerUserController, loginUserController, logoutUserController };}
+module.exports = { registerUserController, loginUserController, logoutUserController, getMeController };}
