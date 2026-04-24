@@ -89,21 +89,11 @@ async function loginUserController(req, res) {
 
 async function logoutUserController(req, res) {
     const token = req.cookies.token;
-   if(token){
-    await tokenBlacklistModel.create({token});
-   }
-res.clearCookie('token');
-res.status(200).json({message: 'User logged out successfully'});
-
-
-/** * logoutUserController
- * @description clear token from user cookies and add the token in blacklist, expacts token in cookies
- * @access Public
- */
-
-async function logoutUserController(req, res) {
-    
-
+    if (token) {
+        await tokenBlacklistModel.create({ token });
+    }
+    res.clearCookie('token');
+    res.status(200).json({ message: 'User logged out successfully' });
 }
 
 
@@ -123,4 +113,4 @@ async function getMeController(req, res) {
     });
 }
 
-module.exports = { registerUserController, loginUserController, logoutUserController, getMeController };}
+module.exports = { registerUserController, loginUserController, logoutUserController, getMeController };
