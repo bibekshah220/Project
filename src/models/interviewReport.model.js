@@ -49,7 +49,6 @@ jobDescription: {
 resume: {
     type: String,
 },
-
 selfDescription: {
     type: String,
 },
@@ -58,8 +57,10 @@ matchScore: {
     min: 0,
     max: 100,
 },
-
-
+technicalQuestions: [technoicalQuestionSchema],
+behaviouralQuestions: [behaviouralQuestionSchema],
+skillGaps: [skillGapSchema],
+preparationPlan: [preparationPlanSchema],
 })  
 
 const skillGapSchema = new mongoose.Schema({
@@ -73,6 +74,23 @@ severity: {
     enum: ['Low', 'Medium', 'High'],
     required: [true, 'Severity is required'],
 },
+}, {
+    _id: false,
+})
+
+const preparationPlanSchema = new mongoose.Schema({
+    day: {
+        type: Number,
+        required: [true, 'Day is required'],
+    },
+    focus: {
+        type: String,
+        required: [true, 'Focus is required'],
+    },
+    tasks: {
+        type: [String],
+        required: [true, 'Tasks are required'],
+    },
 }, {
     _id: false,
 })
