@@ -73,6 +73,7 @@ Respond ONLY with valid JSON matching the provided schema.`;
     });
 
     const report = JSON.parse(response.text);
+    console.log(report);
     return {
         ...report,
         jobDescription,
