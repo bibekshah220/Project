@@ -58,6 +58,11 @@ technicalQuestions: [technoicalQuestionSchema],
 behaviouralQuestions: [behaviouralQuestionSchema],
 skillGaps: [skillGapSchema],
 preparationPlan: [preparationPlanSchema],
+user:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+
+},
 })  
 
 const skillGapSchema = new mongoose.Schema({
