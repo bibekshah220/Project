@@ -109,7 +109,7 @@ IMPORTANT: All text must be plain text. Do NOT use HTML tags. Respond ONLY with 
     });
 
     const report = JSON.parse(response.text);
-    console.log(report);
+    console.log(JSON.stringify(report, null, 2));
     return {
         ...report,
         jobDescription,
