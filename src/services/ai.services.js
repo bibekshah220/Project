@@ -20,11 +20,22 @@ const interviewReportResponseSchema = {
     properties: {
         matchScore: {
             type: Type.NUMBER,
-            description: "How well the candidate matches the job description, 0-100",
+            description: "Overall match score 0-100",
+        },
+        scoreBreakdown: {
+            type: Type.OBJECT,
+            description: "Breakdown of match score by category",
+            properties: {
+                technicalSkills: { type: Type.NUMBER, description: "Technical skills match 0-100" },
+                experience: { type: Type.NUMBER, description: "Experience level match 0-100" },
+                toolsAndFrameworks: { type: Type.NUMBER, description: "Tools and frameworks match 0-100" },
+                softSkills: { type: Type.NUMBER, description: "Soft skills and culture fit 0-100" },
+            },
+            required: ["technicalSkills", "experience", "toolsAndFrameworks", "softSkills"],
         },
         summary: {
             type: Type.STRING,
-            description: "A short overall summary of how well the candidate fits the role, 2-3 sentences in plain text",
+            description: "A short 2-3 sentence overall assessment in plain text",
         },
         strengths: {
             type: Type.ARRAY,
@@ -34,24 +45,32 @@ const interviewReportResponseSchema = {
         weaknesses: {
             type: Type.ARRAY,
             items: { type: Type.STRING },
-            description: "List of candidate weaknesses or areas of concern for the job",
+            description: "List of candidate weaknesses or concerns for the job",
         },
         focusAreas: {
             type: Type.ARRAY,
             items: { type: Type.STRING },
-            description: "Key areas the candidate should focus on before the interview",
+            description: "Key areas the candidate should prioritize before the interview",
         },
         technicalQuestions: {
             type: Type.ARRAY,
             items: {
                 type: Type.OBJECT,
                 properties: {
-                    question: { type: Type.STRING, description: "The technical question that can be asked in the interview" },
-                    intention: { type: Type.STRING, description: "The intention of the interviewer behind asking this question" },
+                    id: { type: Type.NUMBER, description: "Sequential question number starting from 1" },
+                    topic: { type: Type.STRING, description: "The technical topic this question covers, e.g. React, Node.js, MongoDB" },
+                    difficulty: { type: Type.STRING, description: "Question difficulty: Easy, Medium, or Hard" },
+                    question: { type: Type.STRING, description: "The interview question" },
+                    intention: { type: Type.STRING, description: "Why the interviewer asks this question" },
+                    keyPoints: {
+                        type: Type.ARRAY,
+                        items: { type: Type.STRING },
+                        description: "3-5 bullet points that must be covered in the answer",
+                    },
                     shortAnswer: { type: Type.STRING, description: "A concise 1-2 sentence answer summary" },
-                    detailedAnswer: { type: Type.STRING, description: "A thorough explanation covering key points, structure, and examples. Plain text only, no HTML." },
+                    detailedAnswer: { type: Type.STRING, description: "A thorough explanation with structure and examples. Plain text only." },
                 },
-                required: ["question", "intention", "shortAnswer", "detailedAnswer"],
+                required: ["id", "topic", "difficulty", "question", "intention", "keyPoints", "shortAnswer", "detailedAnswer"],
             },
         },
         behaviouralQuestions: {
@@ -59,12 +78,19 @@ const interviewReportResponseSchema = {
             items: {
                 type: Type.OBJECT,
                 properties: {
-                    question: { type: Type.STRING, description: "The behavioural question that can be asked in the interview" },
-                    intention: { type: Type.STRING, description: "The intention of the interviewer behind asking this question" },
+                    id: { type: Type.NUMBER, description: "Sequential question number starting from 1" },
+                    trait: { type: Type.STRING, description: "The trait being assessed, e.g. Leadership, Teamwork, Problem Solving" },
+                    question: { type: Type.STRING, description: "The interview question" },
+                    intention: { type: Type.STRING, description: "Why the interviewer asks this question" },
+                    keyPoints: {
+                        type: Type.ARRAY,
+                        items: { type: Type.STRING },
+                        description: "3-5 bullet points to cover using the STAR method",
+                    },
                     shortAnswer: { type: Type.STRING, description: "A concise 1-2 sentence answer summary" },
-                    detailedAnswer: { type: Type.STRING, description: "A thorough explanation with STAR method guidance, key points, and examples. Plain text only, no HTML." },
+                    detailedAnswer: { type: Type.STRING, description: "A thorough STAR-method answer with examples. Plain text only." },
                 },
-                required: ["question", "intention", "shortAnswer", "detailedAnswer"],
+                required: ["id", "trait", "question", "intention", "keyPoints", "shortAnswer", "detailedAnswer"],
             },
         },
         skillGaps: {
@@ -72,11 +98,13 @@ const interviewReportResponseSchema = {
             items: {
                 type: Type.OBJECT,
                 properties: {
-                    skill: { type: Type.STRING, description: "The skill that the candidate is missing or weak in" },
-                    severity: { type: Type.STRING, description: "How critical this skill gap is: Low, Medium, or High" },
-                    reason: { type: Type.STRING, description: "Why this is a gap and how it relates to the job requirements" },
+                    skill: { type: Type.STRING, description: "The missing or weak skill" },
+                    severity: { type: Type.STRING, description: "Low, Medium, or High" },
+                    category: { type: Type.STRING, description: "Category: Technical, Tool, Soft Skill, or Process" },
+                    reason: { type: Type.STRING, description: "Why this is a gap relative to the job requirements" },
+                    suggestion: { type: Type.STRING, description: "A short actionable suggestion to address this gap" },
                 },
-                required: ["skill", "severity", "reason"],
+                required: ["skill", "severity", "category", "reason", "suggestion"],
             },
         },
         preparationPlan: {
@@ -86,22 +114,32 @@ const interviewReportResponseSchema = {
                 properties: {
                     day: { type: Type.NUMBER, description: "Day number of the preparation plan" },
                     focus: { type: Type.STRING, description: "The main focus area for this day" },
+                    goals: {
+                        type: Type.ARRAY,
+                        items: { type: Type.STRING },
+                        description: "2-3 measurable goals for the day",
+                    },
                     tasks: {
                         type: Type.ARRAY,
                         items: { type: Type.STRING },
-                        description: "List of tasks to complete on this day",
+                        description: "Specific tasks to complete on this day",
+                    },
+                    resources: {
+                        type: Type.ARRAY,
+                        items: { type: Type.STRING },
+                        description: "Suggested resources like docs, tutorials, or tools",
                     },
                 },
-                required: ["day", "focus", "tasks"],
+                required: ["day", "focus", "goals", "tasks", "resources"],
             },
         },
     },
-    required: ["matchScore", "summary", "strengths", "weaknesses", "focusAreas", "technicalQuestions", "behaviouralQuestions", "skillGaps", "preparationPlan"],
+    required: ["matchScore", "scoreBreakdown", "summary", "strengths", "weaknesses", "focusAreas", "technicalQuestions", "behaviouralQuestions", "skillGaps", "preparationPlan"],
 };
 
 async function generateInterviewReport({ resume, jobDescription, selfDescription }) {
 
-    const prompt = `You are an expert interview coach. Analyze the candidate's resume, self-description, and the job description below. Generate a detailed interview preparation report as strictly valid JSON.
+    const prompt = `You are an expert interview coach. Analyze the candidate's resume, self-description, and the job description below. Generate a structured interview preparation report as strictly valid JSON.
 
 Resume:
 ${resume}
@@ -113,17 +151,18 @@ Job Description:
 ${jobDescription}
 
 Generate the following:
-1. matchScore: A number 0-100 based on how well the candidate fits the job
-2. summary: A short 2-3 sentence overall assessment of the candidate's fit
-3. strengths: An array of the candidate's key strengths relevant to this role
-4. weaknesses: An array of the candidate's weaknesses or concerns for this role
-5. focusAreas: An array of key areas to focus on before the interview
-6. technicalQuestions: 5-7 technical questions, each with question, intention, shortAnswer (1-2 sentences), and detailedAnswer (thorough explanation with key points and examples)
-7. behaviouralQuestions: 3-5 behavioural questions, each with question, intention, shortAnswer (1-2 sentences), and detailedAnswer (STAR method guidance with examples)
-8. skillGaps: Skills the candidate is missing, each with skill name, severity (Low/Medium/High), and reason
-9. preparationPlan: A 5-day plan, each day with day number, focus area, and list of tasks
+1. matchScore: Overall match 0-100
+2. scoreBreakdown: Scores for technicalSkills, experience, toolsAndFrameworks, softSkills (each 0-100)
+3. summary: 2-3 sentence overall assessment
+4. strengths: Array of relevant strengths
+5. weaknesses: Array of concerns or weak areas
+6. focusAreas: Array of priority areas before the interview
+7. technicalQuestions: 5-7 questions, each with id (sequential from 1), topic (e.g. React, Node.js), difficulty (Easy/Medium/Hard), question, intention, keyPoints (3-5 bullets to cover), shortAnswer (1-2 sentences), detailedAnswer (thorough with examples)
+8. behaviouralQuestions: 3-5 questions, each with id (sequential from 1), trait (e.g. Leadership, Teamwork), question, intention, keyPoints (3-5 STAR bullets), shortAnswer (1-2 sentences), detailedAnswer (STAR method with examples)
+9. skillGaps: Each with skill, severity (Low/Medium/High), category (Technical/Tool/Soft Skill/Process), reason, and suggestion (actionable fix)
+10. preparationPlan: 5-day plan, each day with day number, focus, goals (2-3 measurable), tasks (specific actions), resources (docs/tutorials/tools)
 
-IMPORTANT: All text must be plain text. Do NOT use HTML tags. Do NOT include any text outside the JSON object.`;
+IMPORTANT: All text must be plain text. No HTML tags. No text outside the JSON object.`;
 
     const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
