@@ -22,6 +22,25 @@ const interviewReportResponseSchema = {
             type: Type.NUMBER,
             description: "How well the candidate matches the job description, 0-100",
         },
+        summary: {
+            type: Type.STRING,
+            description: "A short overall summary of how well the candidate fits the role, 2-3 sentences in plain text",
+        },
+        strengths: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
+            description: "List of candidate strengths relevant to the job",
+        },
+        weaknesses: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
+            description: "List of candidate weaknesses or areas of concern for the job",
+        },
+        focusAreas: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
+            description: "Key areas the candidate should focus on before the interview",
+        },
         technicalQuestions: {
             type: Type.ARRAY,
             items: {
@@ -29,9 +48,10 @@ const interviewReportResponseSchema = {
                 properties: {
                     question: { type: Type.STRING, description: "The technical question that can be asked in the interview" },
                     intention: { type: Type.STRING, description: "The intention of the interviewer behind asking this question" },
-                    answer: { type: Type.STRING, description: "How to answer this question in plain text, what points to cover and how to structure the answer. Do NOT use HTML." },
+                    shortAnswer: { type: Type.STRING, description: "A concise 1-2 sentence answer summary" },
+                    detailedAnswer: { type: Type.STRING, description: "A thorough explanation covering key points, structure, and examples. Plain text only, no HTML." },
                 },
-                required: ["question", "intention", "answer"],
+                required: ["question", "intention", "shortAnswer", "detailedAnswer"],
             },
         },
         behaviouralQuestions: {
@@ -41,9 +61,10 @@ const interviewReportResponseSchema = {
                 properties: {
                     question: { type: Type.STRING, description: "The behavioural question that can be asked in the interview" },
                     intention: { type: Type.STRING, description: "The intention of the interviewer behind asking this question" },
-                    answer: { type: Type.STRING, description: "How to answer this question in plain text, what points to cover and how to structure the answer. Do NOT use HTML." },
+                    shortAnswer: { type: Type.STRING, description: "A concise 1-2 sentence answer summary" },
+                    detailedAnswer: { type: Type.STRING, description: "A thorough explanation with STAR method guidance, key points, and examples. Plain text only, no HTML." },
                 },
-                required: ["question", "intention", "answer"],
+                required: ["question", "intention", "shortAnswer", "detailedAnswer"],
             },
         },
         skillGaps: {
@@ -53,8 +74,9 @@ const interviewReportResponseSchema = {
                 properties: {
                     skill: { type: Type.STRING, description: "The skill that the candidate is missing or weak in" },
                     severity: { type: Type.STRING, description: "How critical this skill gap is: Low, Medium, or High" },
+                    reason: { type: Type.STRING, description: "Why this is a gap and how it relates to the job requirements" },
                 },
-                required: ["skill", "severity"],
+                required: ["skill", "severity", "reason"],
             },
         },
         preparationPlan: {
@@ -74,12 +96,12 @@ const interviewReportResponseSchema = {
             },
         },
     },
-    required: ["matchScore", "technicalQuestions", "behaviouralQuestions", "skillGaps", "preparationPlan"],
+    required: ["matchScore", "summary", "strengths", "weaknesses", "focusAreas", "technicalQuestions", "behaviouralQuestions", "skillGaps", "preparationPlan"],
 };
 
 async function generateInterviewReport({ resume, jobDescription, selfDescription }) {
 
-    const prompt = `You are an expert interview coach. Analyze the candidate's resume, self-description, and the job description below. Generate a detailed interview preparation report.
+    const prompt = `You are an expert interview coach. Analyze the candidate's resume, self-description, and the job description below. Generate a detailed interview preparation report as strictly valid JSON.
 
 Resume:
 ${resume}
@@ -90,14 +112,18 @@ ${selfDescription}
 Job Description:
 ${jobDescription}
 
-Generate:
-1. A match score (0-100) based on how well the candidate fits the job
-2. 5-7 technical questions likely to be asked, with intention and detailed answer guidance
-3. 3-5 behavioural questions with intention and answer guidance
-4. Skill gaps the candidate should address, with severity (Low/Medium/High)
-5. A 5-day preparation plan with daily focus and tasks
+Generate the following:
+1. matchScore: A number 0-100 based on how well the candidate fits the job
+2. summary: A short 2-3 sentence overall assessment of the candidate's fit
+3. strengths: An array of the candidate's key strengths relevant to this role
+4. weaknesses: An array of the candidate's weaknesses or concerns for this role
+5. focusAreas: An array of key areas to focus on before the interview
+6. technicalQuestions: 5-7 technical questions, each with question, intention, shortAnswer (1-2 sentences), and detailedAnswer (thorough explanation with key points and examples)
+7. behaviouralQuestions: 3-5 behavioural questions, each with question, intention, shortAnswer (1-2 sentences), and detailedAnswer (STAR method guidance with examples)
+8. skillGaps: Skills the candidate is missing, each with skill name, severity (Low/Medium/High), and reason
+9. preparationPlan: A 5-day plan, each day with day number, focus area, and list of tasks
 
-IMPORTANT: All text must be plain text. Do NOT use HTML tags. Respond ONLY with valid JSON.`;
+IMPORTANT: All text must be plain text. Do NOT use HTML tags. Do NOT include any text outside the JSON object.`;
 
     const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
