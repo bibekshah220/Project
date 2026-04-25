@@ -1,8 +1,5 @@
 const mongoose = require('mongoose');
 
-
-
-
 const technoicalQuestionSchema = new mongoose.Schema({
 
 question: {
@@ -95,4 +92,8 @@ const preparationPlanSchema = new mongoose.Schema({
     _id: false,
 })
 
+
+const InterviewReportModel = mongoose.model('InterviewReport', interviewReportSchema);
+
+module.exports = InterviewReportModel;
 
