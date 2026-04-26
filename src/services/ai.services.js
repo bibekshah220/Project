@@ -18,6 +18,10 @@ async function invokgeGenAI(){
 const interviewReportResponseSchema = {
     type: Type.OBJECT,
     properties: {
+        jobTitle: {
+            type: Type.STRING,
+            description: "The job title extracted or inferred from the job description",
+        },
         matchScore: {
             type: Type.NUMBER,
             description: "Overall match score 0-100",
@@ -93,7 +97,7 @@ const interviewReportResponseSchema = {
             },
         },
     },
-    required: ["matchScore", "summary", "strengths", "weaknesses", "focusAreas", "technicalQuestions", "behaviouralQuestions", "skillGaps", "preparationPlan"],
+    required: ["jobTitle", "matchScore", "summary", "strengths", "weaknesses", "focusAreas", "technicalQuestions", "behaviouralQuestions", "skillGaps", "preparationPlan"],
 };
 
 async function generateInterviewReport({ resume, jobDescription, selfDescription }) {
@@ -124,6 +128,7 @@ ${jobDescription}
 REQUIRED JSON STRUCTURE:
 
 {
+  "jobTitle": string (the job title from the job description),
   "matchScore": number (0-100),
   "summary": string (2-3 sentence assessment),
   "strengths": string[],
