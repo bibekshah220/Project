@@ -31,6 +31,24 @@ async function generateInterviewReportController(req, res) {
     }
 }
 
+async function getInterviewReportController(req, res) {
+    try {
+        const report = await interviewReportModel.findOne({
+            _id: req.params.id,
+            user: req.user._id,
+        });
+
+        if (!report) {
+            return res.status(404).json({ message: "Report not found" });
+        }
+
+        res.status(200).json({ interviewReport: report });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 module.exports = {
     generateInterviewReportController,
+    getInterviewReportController,
 };
