@@ -48,7 +48,17 @@ async function getInterviewReportController(req, res) {
     }
 }
 
+async function getAllInterviewReportsController(req, res) {
+    try {
+        const reports = await interviewReportModel.find({ user: req.user._id }).sort({ createdAt: -1 });
+        res.status(200).json({ interviewReports: reports });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 module.exports = {
     generateInterviewReportController,
     getInterviewReportController,
+    getAllInterviewReportsController,
 };
