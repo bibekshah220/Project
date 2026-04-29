@@ -4,19 +4,27 @@ const interviewReportModel = require('../models/interviewReport.model');
 
 async function generateInterviewReportController(req, res) {
     try {
-        const resumeContent = (await new pdfParse.PDFparse(Uint8Array.from(req.file.buffer))).text();
+        if (!req.file) {
+            return res.status(400).json({ message: "Resume PDF is required" });
+        }
+
+        const resumeText = (await new pdfParse.PDFparse(Uint8Array.from(req.file.buffer))).text();
         const selfDescription = req.body.selfDescription;
         const jobDescription = req.body.jobDescription;
 
+        if (!jobDescription) {
+            return res.status(400).json({ message: "Job description is required" });
+        }
+
         const interviewReportByAi = await generateInterviewReport({
-            resume: resumeContent.text,
+            resume: resumeText,
             selfDescription,
             jobDescription,
         });
 
         const interviewReport = await interviewReportModel.create({
             user: req.user._id,
-            resume: resumeContent.text,
+            resume: resumeText,
             selfDescription,
             jobDescription,
             ...interviewReportByAi,
