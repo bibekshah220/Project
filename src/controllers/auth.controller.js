@@ -24,8 +24,8 @@ async function registerUserController(req, res) {
         return res.status(400).json({message: 'Username must be at least 3 characters'});
     }
 
-    if(!/^[a-zA-Z0-9_]+$/.test(trimmedUsername)) {
-        return res.status(400).json({message: 'Username can only contain letters, numbers, and underscores'});
+    if(!/^[a-zA-Z0-9_ ]+$/.test(trimmedUsername)) {
+        return res.status(400).json({message: 'Username can only contain letters, numbers, spaces, and underscores'});
     }
 
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
